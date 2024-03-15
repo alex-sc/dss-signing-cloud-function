@@ -28,19 +28,35 @@ Make sure to build before deploying
 
 #### Manual
 Create  
-`aws lambda create-function \
---function-name dss-sign-pdf-lambda \
---runtime java21 \
---handler com.github.alexsc.dss.SignPdfLambda \
---role arn:aws:iam::175379499180:role/service-role/fdfrf-role-keyh1pva \
---timeout 600 \
---memory-size 512 \
---zip-file fileb://target/deployment/dss-signing-cloud-function-1.0.jar`  
+```shell
+aws lambda create-function \
+ --function-name dss-sign-pdf-lambda \
+ --runtime java21 \
+ --handler com.github.alexsc.dss.SignPdfLambda \
+ --role arn:aws:iam::175379499180:role/service-role/fdfrf-role-keyh1pva \
+ --timeout 600 \
+ --memory-size 512 \
+ --zip-file fileb://target/deployment/dss-signing-cloud-function-1.0.jar
+```
   
 Assign URL  
-`aws lambda create-function-url-config \
+```shell
+aws lambda create-function-url-config \
  --function-name dss-sign-pdf-lambda \
- --auth-type NONE`
+ --auth-type NONE
+```
+
+Assign permisison
+
+```shell
+aws lambda add-permission \
+ --function-name dss-sign-pdf-lambda \
+ --statement-id FunctionURLAllowPublicAccess \
+ --action lambda:InvokeFunctionUrl \
+ --principal '*' \
+ --function-url-auth-type NONE
+```
+
 Update  
 `aws lambda update-function-code --function-name dss-sign-pdf-lambda  --zip-file fileb://target/deployment/dss-signing-cloud-function-1.0.jar`
 
