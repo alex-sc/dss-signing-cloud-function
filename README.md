@@ -24,20 +24,30 @@ and
 `curl --data-binary "@document.pdf" -o signed.pdf localhost:8080`
 
 ### Deploy
-Either manually  
-`aws lambda create-function --function-name dss-sign-pdf-lambda \
---runtime java21 --handler com.github.alexsc.dss.SignPdfLambda \
+Make sure to build before deploying
+
+#### Manual
+Create  
+`aws lambda create-function \
+--function-name dss-sign-pdf-lambda \
+--runtime java21 \
+--handler com.github.alexsc.dss.SignPdfLambda \
 --role arn:aws:iam::175379499180:role/service-role/fdfrf-role-keyh1pva \
+--timeout 600 \
+--memory-size 512 \
 --zip-file fileb://target/deployment/dss-signing-cloud-function-1.0.jar`  
+  
 Assign URL  
 `aws lambda create-function-url-config \
  --function-name dss-sign-pdf-lambda \
- --auth-type NONE`  
-or using Terraform  
-`https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lambda_function`
-
-Update
+ --auth-type NONE`
+Update  
 `aws lambda update-function-code --function-name dss-sign-pdf-lambda  --zip-file fileb://target/deployment/dss-signing-cloud-function-1.0.jar`
+
+#### Terraform
+- `terraform -chdir=terraform/aws/ init`
+- `terraform -chdir=terraform/aws/ apply`
+- `terraform -chdir=terraform/aws/ show | grep function_url`
+
 ### Use
 `curl --data-binary "@document.pdf" -o signed.pdf https://6dagp34oy4i7f2e75viiy2kr440lifdz.lambda-url.us-east-1.on.aws/`
-
