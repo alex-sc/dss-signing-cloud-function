@@ -35,6 +35,9 @@ Assign URL
  --auth-type NONE`  
 or using Terraform  
 `https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lambda_function`
+
+Update
+`aws lambda update-function-code --function-name dss-sign-pdf-lambda  --zip-file fileb://target/deployment/dss-signing-cloud-function-1.0.jar`
 ### Use
 `curl --data-binary "@document.pdf" -o signed.pdf https://6dagp34oy4i7f2e75viiy2kr440lifdz.lambda-url.us-east-1.on.aws/`
 

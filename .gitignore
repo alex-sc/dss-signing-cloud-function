@@ -27,3 +27,7 @@ replay_pid*
 .classpath
 .project
 .settings/
+dependency-reduced-pom.xml
+
+.idea/
+.DS_Store
