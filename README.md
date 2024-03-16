@@ -29,31 +29,31 @@ Make sure to build before deploying
 #### Manual
 Create  
 ```shell
-aws lambda create-function \
- --function-name dss-sign-pdf-lambda \
- --runtime java21 \
- --handler com.github.alexsc.dss.SignPdfLambda \
- --role arn:aws:iam::175379499180:role/service-role/fdfrf-role-keyh1pva \
- --timeout 600 \
- --memory-size 512 \
- --zip-file fileb://target/deployment/dss-signing-cloud-function-1.0.jar
+aws lambda create-function \  
+ --function-name dss-sign-pdf-lambda \  
+ --runtime java21 \  
+ --handler com.github.alexsc.dss.SignPdfLambda \  
+ --role arn:aws:iam::175379499180:role/service-role/fdfrf-role-keyh1pva \  
+ --timeout 600 \  
+ --memory-size 512 \  
+ --zip-file fileb://target/deployment/dss-signing-cloud-function-1.0.jar  
 ```
   
 Assign URL  
 ```shell
-aws lambda create-function-url-config \
- --function-name dss-sign-pdf-lambda \
+aws lambda create-function-url-config \  
+ --function-name dss-sign-pdf-lambda \  
  --auth-type NONE
 ```
 
-Assign permisison
+Assign permission
 
 ```shell
-aws lambda add-permission \
- --function-name dss-sign-pdf-lambda \
- --statement-id FunctionURLAllowPublicAccess \
- --action lambda:InvokeFunctionUrl \
- --principal '*' \
+aws lambda add-permission \  
+ --function-name dss-sign-pdf-lambda \  
+ --statement-id FunctionURLAllowPublicAccess \  
+ --action lambda:InvokeFunctionUrl \  
+ --principal '*' \  
  --function-url-auth-type NONE
 ```
 
@@ -67,3 +67,16 @@ Update
 
 ### Use
 `curl --data-binary "@document.pdf" -o signed.pdf https://6dagp34oy4i7f2e75viiy2kr440lifdz.lambda-url.us-east-1.on.aws/`
+
+
+## Azure
+
+### Deploy
+
+#### Manual
+
+Adjust Azure configuration in `pom.xml` and  
+`mvn clean package azure-functions:deploy`
+
+### Use
+`curl -v --data "@document.base64" https://dss-sign-pdf-function.azurewebsites.net/api/dss-sign-pdf-function-port/ --output signed.pdf`

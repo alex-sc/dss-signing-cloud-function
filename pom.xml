@@ -11,12 +11,22 @@
         <maven.compiler.source>11</maven.compiler.source>
         <project.encoding>UTF-8</project.encoding>
 
+        <!-- DSS -->
         <sd-dss.version>5.12.1</sd-dss.version>
         <httpcomponents.version>5.2.1</httpcomponents.version>
+
+        <!-- Azure -->
+        <azure.functions.maven.plugin.version>1.22.0</azure.functions.maven.plugin.version>
+        <azure.functions.java.library.version>3.0.0</azure.functions.java.library.version>
+        <functionAppName>dss-sign-pdf-function</functionAppName>
+        <functionAppRegion>eastus</functionAppRegion>
+        <functionResourceGroup>dss-sign-pdf-function_group</functionResourceGroup>
+        <functionServicePlan>ASP-dsssignpdffunctiongroup-8360</functionServicePlan>
+        <functionPricingTier>Y1</functionPricingTier>
     </properties>
 
     <dependencies>
-        <!-- Google Cloud Functions -->
+        <!-- GCP Cloud Functions -->
         <dependency>
             <groupId>com.google.cloud.functions</groupId>
             <artifactId>functions-framework-api</artifactId>
@@ -30,16 +40,19 @@
             <artifactId>aws-lambda-java-core</artifactId>
             <version>1.2.2</version>
         </dependency>
+
+        <!-- Azure Function -->
         <dependency>
-            <groupId>com.amazonaws</groupId>
-            <artifactId>aws-lambda-java-events</artifactId>
-            <version>3.11.1</version>
+            <groupId>com.microsoft.azure.functions</groupId>
+            <artifactId>azure-functions-java-library</artifactId>
+            <version>${azure.functions.java.library.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.amazonaws</groupId>
-            <artifactId>aws-lambda-java-log4j2</artifactId>
-            <version>1.5.1</version>
+            <groupId>com.azure</groupId>
+            <artifactId>azure-storage-blob</artifactId>
+            <version>12.25.2</version>
         </dependency>
+
 
         <!-- DSS -->
         <dependency>
@@ -73,13 +86,6 @@
             <artifactId>dss-token</artifactId>
             <version>${sd-dss.version}</version>
         </dependency>
-        <!--
-        <dependency>
-            <groupId>eu.europa.ec.joinup.sd-dss</groupId>
-            <artifactId>dss-tsl-validation</artifactId>
-            <version>${sd-dss.version}</version>
-        </dependency>
-        -->
 
         <!-- DSS dependencies -->
         <dependency>
@@ -105,7 +111,7 @@
 
     <build>
         <plugins>
-            <!-- Run Cloud Fuction locally -->
+            <!-- Run GCP Cloud Function locally -->
             <plugin>
                 <groupId>com.google.cloud.functions</groupId>
                 <artifactId>function-maven-plugin</artifactId>
@@ -150,6 +156,38 @@
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
                             </transformers>
                         </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- See https://github.com/microsoft/azure-maven-plugins/wiki/Azure-Functions:-Configuration-Details -->
+            <plugin>
+                <groupId>com.microsoft.azure</groupId>
+                <artifactId>azure-functions-maven-plugin</artifactId>
+                <version>${azure.functions.maven.plugin.version}</version>
+                <configuration>
+                    <appName>${functionAppName}</appName>
+                    <resourceGroup>${functionResourceGroup}</resourceGroup>
+                    <appServicePlanName>${functionServicePlan}</appServicePlanName>
+                    <region>${functionAppRegion}</region>
+                    <pricingTier>${functionPricingTier}</pricingTier>
+                    <runtime>
+                        <os>linux</os>
+                        <javaVersion>17</javaVersion>
+                    </runtime>
+                    <appSettings>
+                        <property>
+                            <name>FUNCTIONS_EXTENSION_VERSION</name>
+                            <value>~4</value>
+                        </property>
+                    </appSettings>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>package-functions</id>
+                        <goals>
+                            <goal>package</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
